@@ -2,10 +2,13 @@
 to generate the data, play a game with NB_PLAYERS bots then find the output_log.txt
 file and run the command : grep "on cell" output_log.txt > rigged.txt
 """
+import os
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy import stats
 
-DATA_PATH = "./rigged3.txt"
+
+DATA_PATH = "./data/"
 NB_PLAYERS = 4
 
 city_list = ["START", "GRANADA", "SEVILLE", "MADRID", "BALI", "HONG KONG", "BEIJING",
@@ -22,7 +25,7 @@ class Player(object):
         self.name = name
         self.last_case = "START"
         self.current_case = "START"
-        print("New player succesfully created.")
+        #print("New player succesfully created.")
     def dice(self):
         current = city_dic[self.current_case]
         last = city_dic[self.last_case]
@@ -33,9 +36,15 @@ class Player(object):
 
 
 def main():
-    name_1, name_2, name_3, name_4 = get_players_names()
-    player_1, player_2, player_3, player_4 = Player(name_1), Player(name_2), Player(name_3), Player(name_4)
-    dice_dict = play(player_1, player_2, player_3, player_4)
+    data_files = os.listdir(DATA_PATH)
+    dict_list = []
+    for data_file in data_files:
+        name_1, name_2, name_3, name_4 = get_players_names(DATA_PATH+data_file)
+        player_1, player_2, player_3, player_4 = Player(name_1), Player(name_2), Player(name_3), Player(name_4)
+        dice_dict = play(player_1, player_2, player_3, player_4, DATA_PATH+data_file)
+        dict_list.append(dice_dict)
+    dice_dict = merge_dicts(dict_list)
+    print(sum(dice_dict.values()))
     plot_results(dice_dict)
     plot_real()
     chi_sqrd = compute_chi_squared(dice_dict)
@@ -44,14 +53,32 @@ def main():
     #Conclusion: the game is rigged.
     #However, more data is needed and more tests will be done soon
 
+def merge_dicts(dict_list):
+    keys = dict_list[0].keys()
+    final_dict = {}
+    for key in keys:
+        sum_value = 0
+        for dico in dict_list:
+            sum_value += dico[key]
+        final_dict[key] = sum_value
+    return final_dict
+
 def compute_chi_squared(dice_dict):
     vals = [dice_dict[i] for i in range(2, 13)]
     real_vals = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
+    list1 = []
+    list2 = []
     chi_sqrd = 0
     for val, real_val in zip(vals, real_vals):
         real_val = real_val / 36
-        val = val / len(vals)
+        val = val / sum(vals)
+        list1.append(real_val)
+        list2.append(val)
+        print(real_val, ":", val)
         chi_sqrd += (val-real_val)**2/real_val
+
+    t, p = stats.ttest_ind(list1, list2)
+    print(t, p)
     return chi_sqrd
 
 def plot_real():
@@ -68,11 +95,11 @@ def plot_results(dice_dict):
     plt.bar(x_vals, vals)
     plt.show()
 
-def play(player_1, player_2, player_3, player_4):
+def play(player_1, player_2, player_3, player_4, data_file_name):
     players_list = [player_1, player_2, player_3, player_4]
     ids_list = [player_1.name, player_2.name, player_3.name, player_4.name]
     dice_dict = {}
-    with open(DATA_PATH) as input_file:
+    with open(data_file_name) as input_file:
         for line in input_file:
             player_id = line.split("Player")[-1].split(" ")[0]
             player = players_list[ids_list.index(player_id)]
@@ -92,9 +119,9 @@ def play(player_1, player_2, player_3, player_4):
     return dice_dict
 
 
-def get_players_names():
+def get_players_names(data_file):
     ids_set = set()
-    with open(DATA_PATH) as input_file:
+    with open(data_file) as input_file:
         for line in input_file:
             player_id = line.split("Player")[-1].split(" ")[0]
             ids_set.add(player_id)
