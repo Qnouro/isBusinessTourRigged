@@ -16,18 +16,19 @@ This repo aims to check the dice rolls and verify if the game is rigged or not.
 
 ## Theory
 
-In order to check if the game is rigged, we are going to study the dice rolls. We are hence testing $H=H_0$ against $H = H_1$ where $H_0$ is "The dices are not rigged" against $H_1$ which is "The dices are rigged".
+In order to check if the game is rigged, we are going to study the dice rolls. We are hence testing <a href="https://www.codecogs.com/eqnedit.php?latex=H&space;=&space;H_0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?H&space;=&space;H_0" title="H = H_0" /></a> against <a href="https://www.codecogs.com/eqnedit.php?latex=H&space;=&space;H_1" target="_blank"><img src="https://latex.codecogs.com/gif.latex?H&space;=&space;H_1" title="H = H_1" /></a> where <a href="https://www.codecogs.com/eqnedit.php?latex=H_0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?H_0" title="H_0" /></a>:"The dices are not rigged" and <a href="https://www.codecogs.com/eqnedit.php?latex=H_1" target="_blank"><img src="https://latex.codecogs.com/gif.latex?H_1" title="H_1" /></a>: "The dices are rigged".
 
 We are using the Scipy stats library in order to make a t-test and calculate a two-tailed p-value for a model that contains 11 degrees of freedom.
 
 In order to use it, the two sets must have similar variances.
 ## Results
 
-Game samples
-![GitHub Logo](/businessTour/img/gathered_data.png)
 
-Expected values
+![GitHub Logo](/businessTour/img/gathered_data.png)
+*Game samples*
+
 ![GitHub Logo](/businessTour/img/real_values.png)
+*Expected values*
 
 variance of the game sample set:0.00235
 variance of the excepted values set:0.00197  
@@ -38,6 +39,6 @@ p_value:
 0.9999999
 
 ## Conclusion
-Due to the spectacularly high value of the p_value, we reject the $H_0$ hypothesis, and can conclude that the game is most-likely not rigged.
+Due to the spectacularly high value of the p_value, we reject the <a href="https://www.codecogs.com/eqnedit.php?latex=H_0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?H_0" title="H_0" /></a> hypothesis, and can conclude that the game is most-likely not rigged.
  
 
