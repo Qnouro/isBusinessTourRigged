@@ -5,6 +5,7 @@ file and run the command : grep "on cell" output_log.txt > rigged.txt
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy import stats
 
 
@@ -47,53 +48,11 @@ def main():
     print(sum(dice_dict.values()))
     plot_results(dice_dict)
     plot_real()
-    chi_sqrd = compute_chi_squared(dice_dict)
-    print(chi_sqrd)
+    p_value = compute_p_value(dice_dict)
     #The chi squared is higher than the critical value. We reject the null hypothesis.
     #Conclusion: the game is rigged.
     #However, more data is needed and more tests will be done soon
 
-def merge_dicts(dict_list):
-    keys = dict_list[0].keys()
-    final_dict = {}
-    for key in keys:
-        sum_value = 0
-        for dico in dict_list:
-            sum_value += dico[key]
-        final_dict[key] = sum_value
-    return final_dict
-
-def compute_chi_squared(dice_dict):
-    vals = [dice_dict[i] for i in range(2, 13)]
-    real_vals = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
-    list1 = []
-    list2 = []
-    chi_sqrd = 0
-    for val, real_val in zip(vals, real_vals):
-        real_val = real_val / 36
-        val = val / sum(vals)
-        list1.append(real_val)
-        list2.append(val)
-        print(real_val, ":", val)
-        chi_sqrd += (val-real_val)**2/real_val
-
-    t, p = stats.ttest_ind(list1, list2)
-    print(t, p)
-    return chi_sqrd
-
-def plot_real():
-    vals = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
-    x_vals = [i for i in range(2, 13)]
-    sns.set()
-    plt.bar(x_vals, vals)
-    plt.show()
-
-def plot_results(dice_dict):
-    vals = [dice_dict[i] for i in range(2, 13)]
-    x_vals = [i for i in range(2, 13)]
-    sns.set()
-    plt.bar(x_vals, vals)
-    plt.show()
 
 def play(player_1, player_2, player_3, player_4, data_file_name):
     players_list = [player_1, player_2, player_3, player_4]
@@ -119,6 +78,37 @@ def play(player_1, player_2, player_3, player_4, data_file_name):
     return dice_dict
 
 
+def compute_p_value(dice_dict):
+    vals = [dice_dict[i] for i in range(2, 13)]
+    real_vals = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
+    list1 = []
+    list2 = []
+    for val, real_val in zip(vals, real_vals):
+        real_val = real_val / 36
+        val = val / sum(vals)
+        list1.append(real_val)
+        list2.append(val)
+        print(real_val, ":", val)
+    #Checking if the variances are similar
+    print(np.var(list1), ":", np.var(list2))
+    print(sum(list1)/len(list1), ":", sum(list2)/len(list2))
+    t, p = stats.ttest_ind(list1, list2)
+    print(t, p)
+    return p
+
+
+
+
+def merge_dicts(dict_list):
+    keys = dict_list[0].keys()
+    final_dict = {}
+    for key in keys:
+        sum_value = 0
+        for dico in dict_list:
+            sum_value += dico[key]
+        final_dict[key] = sum_value
+    return final_dict
+
 def get_players_names(data_file):
     ids_set = set()
     with open(data_file) as input_file:
@@ -128,6 +118,20 @@ def get_players_names(data_file):
             if(len(ids_set) == NB_PLAYERS):
                 return ids_set
     return None
+
+def plot_real():
+    vals = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
+    x_vals = [i for i in range(2, 13)]
+    sns.set()
+    plt.bar(x_vals, vals)
+    plt.show()
+
+def plot_results(dice_dict):
+    vals = [dice_dict[i] for i in range(2, 13)]
+    x_vals = [i for i in range(2, 13)]
+    sns.set()
+    plt.bar(x_vals, vals)
+    plt.show()
 
 if __name__ == "__main__":
     main()
